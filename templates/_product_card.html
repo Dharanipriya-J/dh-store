@@ -1,0 +1,30 @@
+{% macro product_card(p) %}
+<div class="product-card">
+  <a href="{{ url_for('product_detail', product_id=p.product_id) }}">
+    <img src="{{ p.image_url() }}" alt="{{ p.name }}">
+  </a>
+  <div class="product-card-body">
+    <div class="product-cat">{{ p.category }}</div>
+    <a href="{{ url_for('product_detail', product_id=p.product_id) }}" class="product-name">{{ p.name }}</a>
+    <div class="product-rating">★ {{ p.rating }}</div>
+    <div>
+      <span class="price">₹{{ "%.0f"|format(p.price) }}</span>
+      <span class="price-strike">₹{{ "%.0f"|format(p.mrp) }}</span>
+    </div>
+
+    <div class="product-actions">
+      <form action="{{ url_for('cart_add', product_id=p.product_id) }}" method="post">
+        <button type="submit" class="btn btn--gold btn--small btn--full">Add to Cart</button>
+      </form>
+
+      <form action="{{ url_for('wishlist_add', product_id=p.product_id) }}" method="post">
+        <button type="submit" class="btn btn--outline btn--small btn--full wishlist-btn" aria-label="Add {{ p.name }} to wishlist">♥ Wishlist</button>
+      </form>
+
+      <form action="{{ url_for('buy_now', product_id=p.product_id) }}" method="post" class="buy-now-form">
+        <button type="submit" class="btn btn--buy btn--small btn--full">Buy Now</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endmacro %}

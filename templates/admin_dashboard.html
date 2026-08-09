@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard - DH STORE{% endblock %}
+{% block content %}
+<div class="admin-header">
+  <div><h1>Customer Behavior Dashboard</h1><p style="color:#777;margin-top:-8px;">Live behavior data collected from DH STORE customers.</p></div>
+  <div><a href="{{ url_for('admin_export_csv') }}" class="btn btn--gold btn--small">Download CSV</a> <a href="{{ url_for('admin_logout') }}" class="btn btn--outline btn--small">Log Out</a></div>
+</div>
+
+<div class="kpi-grid">
+  <div class="kpi-box"><div class="kpi-box-label">Customers</div><div class="kpi-box-value">{{ total_customers }}</div></div>
+  <div class="kpi-box"><div class="kpi-box-label">Login Sessions</div><div class="kpi-box-value">{{ total_logins }}</div></div>
+  <div class="kpi-box"><div class="kpi-box-label">Product Views</div><div class="kpi-box-value">{{ total_product_views }}</div></div>
+  <div class="kpi-box"><div class="kpi-box-label">Searches</div><div class="kpi-box-value">{{ total_searches }}</div></div>
+  <div class="kpi-box"><div class="kpi-box-label">Cart Events</div><div class="kpi-box-value">{{ total_cart_events }}</div></div>
+  <div class="kpi-box"><div class="kpi-box-label">Purchases</div><div class="kpi-box-value">{{ total_orders }}</div></div>
+  <div class="kpi-box"><div class="kpi-box-label">Products</div><div class="kpi-box-value">{{ total_products }}</div></div>
+  <div class="kpi-box"><div class="kpi-box-label">Revenue</div><div class="kpi-box-value">₹{{ "%.0f"|format(total_revenue) }}</div></div>
+</div>
+
+
+<div class="admin-panel top-bought-panel">
+  <h2>Top Bought Products</h2>
+  <p style="color:#777;font-size:13px;">Products ranked by units purchased from customer orders.</p>
+
+  {% if top_bought_products %}
+  <div class="top-bought-list">
+    {% for name, units, order_count in top_bought_products %}
+    <div class="top-bought-row">
+      <div class="top-bought-rank">{{ loop.index }}</div>
+      <div class="top-bought-name"><b>{{ name }}</b><span>{{ order_count }} order{% if order_count != 1 %}s{% endif %}</span></div>
+      <div class="top-bought-units">{{ units }} sold</div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+    <p style="color:#999;font-size:13px;">No purchases recorded yet.</p>
+  {% endif %}
+</div>
+
+<div class="admin-panel">
+  <h2>Monitored Customer Dataset</h2>
+  <p style="color:#777;font-size:12px;"></p>
+  <div class="table-scroll"><table class="data-table">
+    <thead><tr>
+      <th>Customer ID</th><th>Login Frequency</th><th>Session Duration (sec)</th><th>Products Visited</th>
+      <th>Products Visited ID</th><th>Search Count</th><th>Add To Cart</th><th>Wishlist Count</th>
+      <th>Cart Count</th><th>Purchase Count</th><th>Category Diversity</th><th>Purchase Rate (%)</th>
+    </tr></thead>
+    <tbody>
+      {% for m in metrics %}<tr>
+        <td><b>{{ m.customer_id }}</b></td><td>{{ m.login_frequency }}</td><td>{{ m.avg_session_duration }}</td>
+        <td>{{ m.products_visited_count }}</td><td style="max-width:260px;white-space:normal;">{{ m.products_visited_ids or '-' }}</td>
+        <td>{{ m.search_count }}</td><td>{{ m.added_to_cart }}</td><td>{{ m.wishlist_count }}</td>
+        <td>{{ m.cart_count }}</td><td>{{ m.purchase_count }}</td><td>{{ m.category_diversity }}</td><td>{{ m.purchase_rate }}</td>
+      </tr>{% else %}<tr><td colspan="12" style="color:#999;text-align:center;">No customer activity recorded yet.</td></tr>{% endfor %}
+    </tbody>
+  </table></div>
+</div>
+
+<div class="admin-panel">
+  <h2>Top Search Terms</h2>
+  {% if top_searches %}{% set max_s = top_searches|map(attribute=1)|max %}
+    {% for term, cnt in top_searches %}<div class="bar-row"><div class="bar-label">{{ term }}</div><div class="bar-track"><div class="bar-fill" style="width:{{ (cnt / max_s * 100)|round|int }}%"></div></div><div>{{ cnt }}</div></div>{% endfor %}
+  {% else %}<p style="color:#999;font-size:13px;">No searches recorded yet.</p>{% endif %}
+</div>
+{% endblock %}

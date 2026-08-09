@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Checkout - DH STORE{% endblock %}
+{% block content %}
+
+<div class="page-title">
+  <h1>Checkout</h1>
+  <p>Enter your delivery address to complete your order</p>
+</div>
+
+<div class="checkout-layout">
+  <div class="checkout-box">
+    <h3>Delivery Address</h3>
+
+    {% if saved_addresses %}
+    <p style="font-size:12px;color:#999;">Saved addresses — click to fill in:</p>
+    {% for a in saved_addresses %}
+    <div class="saved-address" onclick="fillAddress('{{ a.full_name }}','{{ a.phone }}','{{ a.line1 }}','{{ a.line2 or '' }}','{{ a.city }}','{{ a.state }}','{{ a.pincode }}','{{ a.landmark or '' }}')">
+      <b>{{ a.full_name }}</b> - {{ a.phone }}<br>
+      {{ a.line1 }}, {{ a.city }}, {{ a.state }} - {{ a.pincode }}
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <form action="{{ url_for('checkout_submit') }}" method="post">
+      <div class="field-row">
+        <div class="field"><label for="full_name">Full Name *</label><input id="full_name" name="full_name" required></div>
+        <div class="field"><label for="phone">Phone Number *</label><input id="phone" name="phone" maxlength="10" placeholder="10-digit mobile" required></div>
+      </div>
+      <div class="field"><label for="line1">Address Line 1 *</label><input id="line1" name="line1" placeholder="House no., street, area" required></div>
+      <div class="field"><label for="line2">Address Line 2</label><input id="line2" name="line2" placeholder="Apartment, suite (optional)"></div>
+      <div class="field-row">
+        <div class="field"><label for="city">City *</label><input id="city" name="city" required></div>
+        <div class="field"><label for="state">State *</label><input id="state" name="state" required></div>
+        <div class="field"><label for="pincode">Pincode *</label><input id="pincode" name="pincode" maxlength="6" required></div>
+      </div>
+      <div class="field"><label for="landmark">Landmark</label><input id="landmark" name="landmark" placeholder="Nearby landmark (optional)"></div>
+
+      <label style="font-size:13px;color:#ccc;"><input type="checkbox" name="save_address" value="1"> Save this address for next time</label>
+
+      <div class="cod-option">
+        <input type="radio" checked disabled> <b>Cash on Delivery (COD)</b><br>
+        <span style="font-size:12px;color:#999;">Pay in cash to the delivery agent when your order arrives. This is the only payment method available.</span>
+      </div>
+
+      <button type="submit" class="btn btn--gold btn--full">Place Order - Pay on Delivery</button>
+    </form>
+  </div>
+
+  <div class="summary-box">
+    <h3>Order Review</h3>
+    {% for item in items %}
+    <div class="summary-row">
+      <span>{{ item.product.name }} × {{ item.quantity }}</span>
+      <span>₹{{ "%.0f"|format(item.product.price * item.quantity) }}</span>
+    </div>
+    {% endfor %}
+    <div class="summary-row summary-row-total"><span>Total (COD)</span><span>₹{{ "%.0f"|format(subtotal) }}</span></div>
+  </div>
+</div>
+
+{% endblock %}

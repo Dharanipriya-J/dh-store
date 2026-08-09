@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% from "_product_card.html" import product_card %}
+{% block title %}{{ product.name }} - DH STORE{% endblock %}
+{% block content %}
+
+<div class="product-detail">
+  <div>
+    <img src="{{ product.image_url() }}" alt="{{ product.name }}">
+  </div>
+
+  <div>
+    <p><a href="{{ url_for('home') }}">Home</a> / Product</p>
+    <h1>{{ product.name }}</h1>
+    <p class="product-rating">★ {{ product.rating }} rating &nbsp;|&nbsp; Product ID: {{ product.product_id }} &nbsp;|&nbsp; {{ product.stock }} in stock</p>
+
+    <p>
+      <span class="price">₹{{ "%.0f"|format(product.price) }}</span>
+      <span class="price-strike">₹{{ "%.0f"|format(product.mrp) }}</span>
+    </p>
+
+    <p>{{ product.description }}</p>
+{% if product.purchase_options() %}
+    <div class="purchase-options">
+      {% for option_name, option_values in product.purchase_options().items() %}
+      <label for="product-{{ option_name|lower }}"> {{ option_name }} </label>
+      <select id="product-{{ option_name|lower }}" name="{{ option_name|lower }}" class="product-option" form="add-to-cart-form" required>
+        <option value="">Select {{ option_name }}</option>
+        {% for option in option_values %}
+        <option value="{{ option }}">{{ option }}</option>
+        {% endfor %}
+      </select>
+      {% endfor %}
+    </div>
+    {% endif %}
+<div class="pd-actions">
+      <form id="add-to-cart-form" action="{{ url_for('cart_add', product_id=product.product_id) }}" method="post">
+        {% if product.purchase_options() %}
+          {% for option_name, option_values in product.purchase_options().items() %}
+          <input type="hidden" name="{{ option_name|lower }}" id="cart-{{ option_name|lower }}" value="">
+          {% endfor %}
+        {% endif %}
+        <button type="submit" class="btn btn--gold btn--full">Add to Cart</button>
+      </form>
+
+      <form id="buy-now-form" action="{{ url_for('buy_now', product_id=product.product_id) }}" method="post">
+        {% if product.purchase_options() %}
+          {% for option_name, option_values in product.purchase_options().items() %}
+          <input type="hidden" name="{{ option_name|lower }}" id="buy-{{ option_name|lower }}" value="">
+          {% endfor %}
+        {% endif %}
+        <button type="submit" class="btn btn--buy btn--full">Buy Now</button>
+      </form>
+
+      {% if in_wishlist %}
+      <form action="{{ url_for('wishlist_view') }}" method="get">
+        <button type="submit" class="btn btn--outline btn--full">In Wishlist ♥</button>
+      </form>
+      {% else %}
+      <form action="{{ url_for('wishlist_add', product_id=product.product_id) }}" method="post">
+        <button type="submit" class="btn btn--outline btn--full">Add to Wishlist ♥</button>
+      </form>
+      {% endif %}
+    </div>
+
+    <h3>Specifications</h3>
+    <table class="spec-table">
+      {% for key, value in product.spec_dict().items() %}
+      <tr><td>{{ key }}</td><td>{{ value }}</td></tr>
+      {% endfor %}
+    </table>
+  </div>
+</div>
+
+
+<script>
+(function () {
+  var selectors = document.querySelectorAll(".product-option");
+  selectors.forEach(function (select) {
+    function syncOption() {
+      var name = select.name;
+      var cartField = document.getElementById("cart-" + name);
+      var buyField = document.getElementById("buy-" + name);
+      if (cartField) cartField.value = select.value;
+      if (buyField) buyField.value = select.value;
+    }
+    select.addEventListener("change", syncOption);
+    syncOption();
+  });
+})();
+</script>
+
+<script>
+(function () {
+  var startedAt = Date.now();
+  function sendDuration() {
+    var seconds = Math.round((Date.now() - startedAt) / 1000 * 10) / 10;
+    var payload = JSON.stringify({duration_seconds: seconds});
+    var url = "{{ url_for('track_product_duration', view_id=view_id) }}";
+    if (navigator.sendBeacon) {
+      navigator.sendBeacon(url, new Blob([payload], {type: "application/json"}));
+    } else {
+      fetch(url, {method: "POST", headers: {"Content-Type": "application/json"}, body: payload, keepalive: true});
+    }
+  }
+  window.addEventListener("pagehide", sendDuration, {once: true});
+})();
+</script>
+
+{% if related_products %}
+<h2 style="margin-top:40px;">You may also like</h2>
+<div class="product-grid">
+  {% for p in related_products %}
+    {{ product_card(p) }}
+  {% endfor %}
+</div>
+{% endif %}
+
+{% endblock %}

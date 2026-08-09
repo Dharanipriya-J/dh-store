@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Order Confirmed - DH STORE{% endblock %}
+{% block content %}
+
+<div class="success-box">
+  <h1>✓ Order Placed Successfully</h1>
+  <p>Thank you, {{ order.full_name }}. Your order will be delivered to {{ order.city }}, {{ order.state }}.</p>
+  <p>Pay ₹{{ "%.0f"|format(order.total_amount) }} in cash on delivery.</p>
+  <div class="order-id-tag">{{ order.order_id }}</div>
+  <br>
+  <a href="{{ url_for('orders_view') }}" class="btn btn--gold">View My Orders</a>
+  <a href="{{ url_for('home') }}" class="btn btn--outline">Continue Shopping</a>
+</div>
+
+{% endblock %}

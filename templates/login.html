@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Login - DH STORE{% endblock %}
+{% block content %}
+
+<div class="auth-wrap">
+  <div class="auth-card">
+    <h1>Login</h1>
+    <p class="auth-card__sub">Welcome to DH STORE</p>
+
+    <form method="post" action="{{ url_for('login_submit') }}">
+      <div class="field">
+        <label for="identifier">Mobile Number or Email</label>
+        <input type="text" id="identifier" name="identifier" placeholder="Enter mobile or email" required autofocus>
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" placeholder="Enter your password" required>
+      </div>
+      <button type="submit" class="btn btn--gold btn--full">Login</button>
+    </form>
+
+    <div class="auth-switch">New here? <a href="{{ url_for('signup') }}">Create an account</a></div>
+  </div>
+</div>
+
+{% endblock %}

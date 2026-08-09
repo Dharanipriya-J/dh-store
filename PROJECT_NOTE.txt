@@ -1,0 +1,12 @@
+DH STORE - Real Customer Behavior E-Commerce Platform
+
+Purpose: Collect real customer interaction data for Behavioral Entropy Analysis for E-Commerce Platform.
+
+Tracked fields: Customer_ID, Login_Frequency, Session_Duration, Products_Visited_Count, Products_Visited_ID, Search_Count, Add_To_Cart_Count, Wishlist_Count, Cart_Count, Purchase_Count, Category_Diversity, Purchase_Rate.
+
+Customer IDs are generated automatically in the form CU8X4P9A21 (CU + 8 unique uppercase letters/numbers).
+
+Admin: /admin/login | username: admin | password: Admin@123
+CSV export: Admin Dashboard -> Download CSV
+Run: pip install -r requirements.txt && python app.py
+Open: http://127.0.0.1:5000

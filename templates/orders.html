@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}My Orders - DH STORE{% endblock %}
+{% block content %}
+
+<div class="orders-page">
+  <div class="page-title orders-title">
+    <h1>My Orders</h1>
+    <p>{{ orders|length }} order{{ 's' if orders|length != 1 else '' }} placed</p>
+  </div>
+
+  {% if orders %}
+  <div class="orders-list">
+    {% for order in orders %}
+    <article class="order-card">
+      <div class="order-card-header">
+        <div>
+          <div class="order-id">Order <strong>{{ order.order_id }}</strong></div>
+          <div class="order-date">Placed {{ order.created_at|ist_datetime }}</div>
+        </div>
+        <span class="order-status">{{ order.status }}</span>
+      </div>
+
+      <div class="order-items">
+        {% for item in order.items %}
+        <div class="order-item">
+          <div class="order-item-image">
+            <img src="{{ item.product.image_url() }}" alt="{{ item.product.name }}">
+          </div>
+          <div class="order-item-details">
+            <h3>{{ item.product.name }}</h3>
+            {% if item.selected_size %}
+            <p class="order-option">Size: {{ item.selected_size }}</p>
+            {% endif %}
+            <p class="order-quantity">Quantity: {{ item.quantity }}</p>
+            <p class="order-price">₹{{ "%.0f"|format(item.price) }}</p>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      <div class="order-card-footer">
+        <div class="delivery-info">
+          <span class="delivery-label">Delivering to</span>
+          <span>{{ order.line1 }}, {{ order.city }}</span>
+        </div>
+        <div class="order-total">
+          <span>Total</span>
+          <strong>₹{{ "%.0f"|format(order.total_amount) }}</strong>
+          <small>Cash on Delivery</small>
+        </div>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-box orders-empty">
+    <h3>No orders yet</h3>
+    <p>You haven't placed any orders.</p>
+    <a href="{{ url_for('home') if 'home' in globals() else url_for('home') }}" class="btn btn--gold">Start Shopping</a>
+  </div>
+  {% endif %}
+</div>
+
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Cart - DH STORE{% endblock %}
+{% block content %}
+
+<div class="page-title">
+  <h1>Your Cart</h1>
+  <p>{{ items|length }} item{{ 's' if items|length != 1 else '' }}</p>
+</div>
+
+{% if items %}
+<div class="cart-layout">
+  <div>
+    {% for item in items %}
+    <div class="cart-item">
+      <a href="{{ url_for('product_detail', product_id=item.product_id) }}">
+        <img src="{{ item.product.image_url() }}" alt="{{ item.product.name }}">
+      </a>
+      <div class="cart-item-info">
+        <div>{{ item.product.category }}</div>
+        <a href="{{ url_for('product_detail', product_id=item.product_id) }}"><b>{{ item.product.name }}</b></a>
+        {% if item.selected_size %}<div class="cart-selected-option">Size: {{ item.selected_size }}</div>{% endif %}
+        <form action="{{ url_for('cart_update', item_id=item.id) }}" method="post" style="margin-top:8px;">
+          Qty:
+          <select name="quantity" onchange="this.form.submit()">
+            {% for n in range(1, 11) %}
+            <option value="{{ n }}" {{ 'selected' if n == item.quantity else '' }}>{{ n }}</option>
+            {% endfor %}
+          </select>
+        </form>
+        <form action="{{ url_for('cart_remove', item_id=item.id) }}" method="post" style="margin-top:6px;">
+          <button type="submit" class="btn btn--outline btn--small">Remove</button>
+        </form>
+      </div>
+      <div class="cart-item-price">₹{{ "%.0f"|format(item.product.price * item.quantity) }}</div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="summary-box">
+    <h3>Order Summary</h3>
+    <div class="summary-row"><span>Subtotal</span><span>₹{{ "%.0f"|format(subtotal) }}</span></div>
+    <div class="summary-row"><span>Delivery</span><span>Free</span></div>
+    <div class="summary-row"><span>Payment</span><span>Cash on Delivery</span></div>
+    <div class="summary-row summary-row-total"><span>Total</span><span>₹{{ "%.0f"|format(subtotal) }}</span></div>
+    <a href="{{ url_for('checkout') }}" class="btn btn--gold btn--full" style="margin-top:14px;display:block;">Proceed to Checkout</a>
+  </div>
+</div>
+{% else %}
+<div class="empty-box">
+  <h3>Your cart is empty</h3>
+  <a href="{{ url_for('home') }}" class="btn btn--gold">Continue Shopping</a>
+</div>
+{% endif %}
+
+{% endblock %}
