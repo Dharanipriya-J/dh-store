@@ -43,7 +43,15 @@ def ist_datetime(value):
         return ""
     return (value + timedelta(hours=5, minutes=30)).strftime("%d %b %Y, %I:%M %p")
 app.secret_key = "dh-store-college-project-secret-key"  # change this if you deploy it anywhere
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(BASE_DIR, "data", "store.db")
+DATABASE_URL = os.environ.get("DATABASE_URL")
+
+if DATABASE_URL:
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+psycopg://", 1)
+    DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+psycopg://", 1)
+else:
+    DATABASE_URL = "sqlite:///" + os.path.join(BASE_DIR, "data", "store.db")
+
+app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db.init_app(app)
